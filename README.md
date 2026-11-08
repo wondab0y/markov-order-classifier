@@ -72,6 +72,28 @@ stationary distributions, infinite-order labels (`np.inf`), and seed.
 Only sequences are classifier inputs. See [the models and order proofs](docs/infinite_order.md),
 based on Step 4 of the Notion notebook and the cited research.
 
+## Stage 2: Higher-block presentation
+
+`src/higher_block.py` converts a conditional probability table into a first-order
+transition matrix on overlapping length-k histories:
+
+```python
+from src.higher_block import higher_block_transition
+
+Q = [[0.8, 0.2], [0.3, 0.7], [0.6, 0.4], [0.1, 0.9]]
+T = higher_block_transition(Q, order=2, num_symbols=2)
+```
+
+For a saved Stage 1 dataset, pass one table at a time, such as
+`data["conditional_probabilities"][0]`. Rows and columns of T use base-m history
+indices (00, 01, 10, 11 in the example). Only overlapping histories can connect.
+The dense matrix has shape `(m**k, m**k)`, so storage grows quickly with order.
+
+Sequence probabilities agree when both representations use the same initial
+history distribution. Keep Stage 1's uniform initialization for direct comparison.
+A stationary distribution instead satisfies `rho @ T == rho` and sums to 1;
+for the example it is `(1/4, 1/12, 1/12, 7/12)`.
+
 Run the tests with:
 
 ```sh
