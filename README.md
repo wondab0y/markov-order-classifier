@@ -94,6 +94,38 @@ history distribution. Keep Stage 1's uniform initialization for direct compariso
 A stationary distribution instead satisfies `rho @ T == rho` and sums to 1;
 for the example it is `(1/4, 1/12, 1/12, 7/12)`.
 
+## Stage 3: Symbolic encoding
+
+`src/encoding.py` labels hidden states and calculates observed-word probabilities:
+
+```python
+from src.encoding import encode_states, symbol_matrices, word_probability
+
+T = [[0.5, 0.3, 0.2], [0.2, 0.6, 0.2], [0.4, 0.1, 0.5]]
+mapping = [0, 1, 1]
+initial = [0.6, 0.3, 0.1]
+observations = encode_states([0, 1, 2, 0], mapping)  # [0, 1, 1, 0]
+M = symbol_matrices(T, mapping, num_symbols=2)
+p = word_probability([0, 1], T, mapping, initial, num_symbols=2)  # 0.2
+```
+
+Here `M[0] = [[0.5, 0, 0], [0.2, 0, 0], [0.4, 0, 0]]` and
+`M[1] = [[0, 0.3, 0.2], [0, 0.6, 0.2], [0, 0.1, 0.5]]`. They label
+destination states and sum to T. The example word starts after the first transition,
+so its probability is `(0.6*0.5 + 0.3*0.2 + 0.1*0.4) * (0.3 + 0.2) = 0.2`.
+
+`word_probability` computes `P(X_1,...,X_r)` with `X_t = mapping[S_t]`,
+using the initial distribution of `S_0`. It omits the initial state's label.
+To compare with an encoded hidden trajectory, use `encode_states(states[1:], mapping)`.
+For Stage 2 order-k block states labeled by their last symbol, the first transition
+emits original `X_k`; the k symbols of the initial history are omitted.
+
+Merging states can make earlier observations relevant to predicting the next
+symbol. If states sharing a label have equal transition probabilities into every
+label class (strong lumpability), the observed process is first-order Markov
+for every initial distribution. Failure of that condition alone does not prove
+non-Markov behavior for a particular initial distribution.
+
 Run the tests with:
 
 ```sh
