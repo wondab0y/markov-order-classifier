@@ -258,3 +258,14 @@ the estimator warns when possible histories outnumber prediction targets.
 If the selected order equals `max_order`, longer memory remains unresolved.
 This is a statistical estimate: finite data cannot certify infinite order, and
 weak dependencies or sparse histories can affect recovery.
+
+### Statistical experiments notebook
+
+Open `notebooks/statistical_experiments.ipynb` with this project's Python environment
+and run all cells. Install its plotting and Jupyter dependencies with
+`python -m pip install -r requirements-notebook.txt`.
+It runs three experiments: finite-order recovery vs. length, Even Process/SNS
+selection frequencies, and detection of weak first-order dependence. Each
+configuration uses 60 runs with reproducible seeds. Raw CSV results, model
+parameters and figures are saved in
+`data/statistical_experiments/`. The full run can take several minutes.
