@@ -126,6 +126,43 @@ label class (strong lumpability), the observed process is first-order Markov
 for every initial distribution. Failure of that condition alone does not prove
 non-Markov behavior for a particular initial distribution.
 
+## Interactive application
+
+Launch the project interface:
+
+```sh
+python3 -m streamlit run app.py
+```
+
+The four tabs provide:
+
+- **Exact Classification:** hidden chains, symbol matrices, and higher-block
+  conditional tables. Presets include a first-order chain, multiple stationary
+  distributions, and the Even Process. When stationarity is not unique, enter
+  rational values for the displayed free parameters and classify the selected model.
+- **Process Generation:** existing i.i.d., first-order, higher-order, Even Process,
+  and SNS generators, with sequence previews, empirical frequencies, model
+  parameters, and NPZ downloads. The infinite-process generator samples both
+  families internally; the app keeps the requested family. Its random parameter
+  settings come from the existing backend.
+- **Representation Minimization:** editable α, symbol matrices, and β, with
+  mathematical output and the Example 4.2 preset (dimension 3 → 2).
+- **Statistical Classification:** generate a sequence directly, paste integer
+  symbols, or upload CSV/NPZ files. BIC estimation shows candidate scores, a curve highlighting the minimum,
+  and fitted conditional probabilities. Set the maximum candidate order before estimating.
+
+Choose dimensions and edit individual cells; no JSON is required. Enter fractions
+such as `1/3` directly. Matrix entries stay as strings until exact parsing on
+submission. Decimals are interpreted exactly as written, so `0.333` differs from
+`1/3`. Headerless CSV import is available for each matrix. Entries persist when
+changing unrelated controls; resizing keeps the overlapping entries and fills
+new cells with zero. Results are marked stale when their inputs change.
+
+The mathematical backend is reused unchanged. Generated floating-point model
+metadata stays separate from exact rational classifier inputs. The app warns
+about larger computations and limits interactive higher-block tables to 4096
+histories; larger models can use the Python API.
+
 ## Stage 4: Exact classifier
 
 ```python
@@ -183,7 +220,18 @@ python -m unittest discover -s tests
 
 `src/statistical.py` estimates order from discrete sequences, including the
 existing generated NPZ datasets. No model parameters or exact arithmetic are
-needed.
+needed. The Statistical Classification tab exposes the same estimator.
+Choose **Generated sequence** for i.i.d., first-order, higher-order, Even Process,
+or SNS generator controls (length, seed, and alphabet/order where applicable).
+Choose **Manual sequence** to paste integers separated by spaces, commas, or
+newlines, or **CSV upload** to load a file. A **Previous batch** option also appears
+when data has been generated in the Process Generation tab.
+It uses generated batches' alphabet metadata; uploads may supply `num_symbols`
+in NPZ metadata or use the editable alphabet-size control. When metadata is
+absent, the suggested size is based on observed symbols; include any unobserved
+symbols in the full alphabet size yourself. Headerless integer CSV files can
+contain one sequence per row or a single sequence in one column. NPZ files must
+contain a `sequences` array (a vector or a table with one sequence per row).
 
 ```python
 import numpy as np
