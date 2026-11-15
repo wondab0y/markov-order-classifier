@@ -69,7 +69,7 @@ Each binary sequence has 10,000 symbols and starts in stationarity. Parameters
 p are drawn independently from [0.2, 0.8), avoiding degenerate endpoints.
 The file includes observed sequences, family names, p, symbol-labeled matrices,
 stationary distributions, infinite-order labels (`np.inf`), and seed.
-Only sequences are classifier inputs. See [the models and order proofs](docs/infinite_order.md),
+Only sequences are classifier inputs. See [the project report](docs/moc_report.pdf),
 based on Step 4 of the Notion notebook and the cited research.
 
 ## Stage 2: Higher-block presentation
@@ -269,3 +269,7 @@ selection frequencies, and detection of weak first-order dependence. Each
 configuration uses 60 runs with reproducible seeds. Raw CSV results, model
 parameters and figures are saved in
 `data/statistical_experiments/`. The full run can take several minutes.
+
+## Project report
+
+The final report is available in [docs/moc_report.pdf](docs/moc_report.pdf).
