@@ -126,6 +126,53 @@ label class (strong lumpability), the observed process is first-order Markov
 for every initial distribution. Failure of that condition alone does not prove
 non-Markov behavior for a particular initial distribution.
 
+## Stage 4: Exact classifier
+
+```python
+from src.stage4_pipeline import classify_hidden_chain, classify_higher_block
+
+result = classify_hidden_chain(
+    T=[["4/5", "1/5"], ["3/10", "7/10"]],
+    mapping=[0, 1],
+)
+print(result["order"])  # 1
+
+# Q is a rational conditional table with m**k rows and m columns.
+# result = classify_higher_block(Q, order=k, m=2)
+```
+
+The pipeline validates the model, computes its stationary distribution, minimizes
+the representation, and tests symbol products using exact rank-one checks.
+Products of rank at most one are pruned. The search stops at the first successful
+order or at `d*(d-1)//2`, where `d` is the minimal dimension. Dimension one gives
+order zero; failure through the bound certifies infinite order.
+
+Results contain `order` (`None` for infinity), `minimal_dimension`, `search_bound`,
+and `diagnostics` with the number of surviving products at each tested order.
+For edge-labeled models, use `classify_symbol_matrices({"0": M0, "1": M1})`.
+All entry points accept an optional stationary `pi`. When it is omitted and the
+stationary distribution is not unique, they return `stationary_family` (a SymPy
+row matrix), `free_parameters`, and nonnegativity `constraints` instead of a
+classification. Choose real parameter values satisfying these constraints and
+pass the resulting probability vector as `pi`:
+
+```python
+T = [[1, 0], [0, 1]]
+family = classify_hidden_chain(T, [0, 1])
+parameter = family["free_parameters"][0]
+pi = list(family["stationary_family"].subs(parameter, "1/2"))
+result = classify_hidden_chain(T, [0, 1], pi=pi)
+```
+
+Nonstationary initial distributions and negative probabilities are rejected.
+
+Use integers, fractions, or quoted rational strings. Decimals are interpreted
+exactly as written, and row sums must equal one exactly. Existing floating-point
+Stage 2–3 helpers are not used by this pipeline. This classifier needs known
+model parameters, not sample sequences or estimated frequencies. The Stage 1
+sample-only classifier remains a separate task. Larger higher-block models can
+be expensive because the state space and exact arithmetic grow with order.
+
 Run the tests with:
 
 ```sh
