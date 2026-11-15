@@ -178,3 +178,35 @@ Run the tests with:
 ```sh
 python -m unittest discover -s tests
 ```
+
+## Stage 5: BIC order estimation
+
+`src/statistical.py` estimates order from discrete sequences, including the
+existing generated NPZ datasets. No model parameters or exact arithmetic are
+needed.
+
+```python
+import numpy as np
+from src.statistical import estimate_markov_order
+
+with np.load("data/order_2.npz", allow_pickle=False) as data:
+    result = estimate_markov_order(
+        data["sequences"][0], max_order=6, m=int(data["num_symbols"])
+    )
+print(result["estimated_order"])
+print(result["scores"])
+```
+
+Every candidate uses the same `N - max_order` prediction targets. BIC uses the
+full parameter count `m**k * (m-1)`; ties select the smallest order. The result
+contains `estimated_order`, `n_eff`, per-order `scores`, and the selected model's
+`conditional_probabilities`, keyed by history tuples (`()` for order zero).
+Unobserved histories are omitted because their probabilities are unestimated;
+unobserved symbols within an observed history have probability zero.
+
+Inputs must be a one-dimensional sequence of integer symbols in `0..m-1`,
+with `m >= 2`, `max_order >= 0`, and `N - max_order > 1`. Counts are sparse;
+the estimator warns when possible histories outnumber prediction targets.
+If the selected order equals `max_order`, longer memory remains unresolved.
+This is a statistical estimate: finite data cannot certify infinite order, and
+weak dependencies or sparse histories can affect recovery.
