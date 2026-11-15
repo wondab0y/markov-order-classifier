@@ -2,6 +2,8 @@
 
 Classify the Markov order of known models with exact arithmetic, or estimate it from observed sequences using BIC.
 
+[Try the app online](https://markov-order-classifier.streamlit.app/).
+
 Set up Python and install the dependencies:
 
 ```sh
